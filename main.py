@@ -22,6 +22,8 @@ def validate(text: str) -> list[str]:
         problems.append("empty text")
     if text.strip() == "":
         problems.append("only white space")
+    if text != text.strip():
+        problems.append("leading or trailing white space: a fortune line must be tight")
     if len(text) > MAX_CHARS:
         problems.append(f"{len(text)} characters, over the {MAX_CHARS} limit")
     if "\n" in text or "\r" in text:
@@ -54,6 +56,12 @@ def main(argv: list[str]) -> int:
         return 1
     OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
     OUTPUT_PATH.write_text(FORTUNE, encoding="utf-8")
+    # Round-trip: prove the file on disk is exactly the validated fortune.
+    written = OUTPUT_PATH.read_text(encoding="utf-8")
+    if written != FORTUNE:
+        print("error: /output/entry.txt does not match the validated fortune",
+              file=sys.stderr)
+        return 1
     return 0
 
 
